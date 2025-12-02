@@ -348,22 +348,22 @@
         <cylinder length="0.0065" radius="0.022"/>
       </geometry>
       <material name="panda_grey">
-        <color rgba="0.3 0.3 0.3 1."/>
+        <color rgba="0 0 1 1."/>
       </material>
     </visual>
     <visual>
       <origin rpy="0.0 0.0 0.0" xyz="0.0 0.0 0.025"/>
       <geometry>
-        <cylinder length="0.05" radius="0.01"/>
+        <cylinder length="0.04" radius="0.01"/>
       </geometry>
       <material name="panda_grey">
-        <color rgba="0.3 0.3 0.3 1."/>
+        <color rgba="0 1 0 1."/>
       </material>
     </visual>
     <collision>
       <origin rpy="0.0 0.0 0.0" xyz="0.0 0.0 0.025"/>
       <geometry>
-        <cylinder length="0.05" radius="0.01"/>
+        <cylinder length="0.04" radius="0.01"/>
       </geometry>
     </collision>
   </link>

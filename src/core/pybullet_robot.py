@@ -293,7 +293,7 @@ class PybulletRobot:
         self._ft_bias = np.zeros([6, 1]) 
         self._is_ft_calibrated = False  
         self._ft_filtered = np.zeros([6, 1])
-        self._alpha = 0.2
+        self._alpha = 0.05
 
         # Constraint & flag
         self._jointpos_lower = [0 for _ in range(self.numJoints)]
@@ -344,9 +344,9 @@ class PybulletRobot:
 
 
         target_SE3 = np.array([
-            [ 0.7093, -0.7048, -0.0139,  0.3042],
-            [-0.7048, -0.7087, -0.0328, -0.0060],
-            [ 0.0132,  0.0330, -0.9994,  0.5017],
+            [ 0.9918 ,-0.1278 ,-0.0075  ,0.4999],
+            [-0.1278, -0.9918, -0.0014,  0.0001],
+            [ -0.0073,  0.0023, -1. ,     0.256],
             [ 0.0000,  0.0000,  0.0000,  1.0000]
         ])
 
@@ -475,7 +475,7 @@ class PybulletRobot:
 
         # You need to implement robot controllers here!
         if True:
-                Kp = 5000
+                Kp = 4000
                 Kd = 200
 
                 qddot = self._qddot_des + Kp * (self._q_des - self._q) + Kd * (self._qdot_des - self._qdot)
@@ -492,42 +492,52 @@ class PybulletRobot:
 
     ## imp
     def _compute_torque_input_impedance(self):
-
-        if not self._is_ft_calibrated and self.time > 1.0:
+        if (not self._is_ft_calibrated) and (self.time > 1.0):
             self._ft_bias = self._ft.copy()
             self._is_ft_calibrated = True
             print(f"[PybulletRobot] F/T Sensor Calibrated. Bias: {self._ft_bias.flatten()}")
 
         if self._is_ft_calibrated:
-            wrench_ext = self._ft - self._ft_bias
+            wrench_ext_body = self._ft - self._ft_bias   # (6,1)
         else:
-            wrench_ext = np.zeros([6, 1])   
+            wrench_ext_body = np.zeros((6, 1))
 
-        tau_ext = self._Jb.T @ wrench_ext
-        tau_ext = np.clip(tau_ext, -10.0, 10.0) 
 
-        e     = self._q_des    - self._q          # position error
-        e_dot = self._qdot_des - self._qdot       # velocity error
-
-        K_val      = 5000.0          # stiffness
-        D_val      =  200.0          # damping
-        Lambda_val =    1.0          # desired inertia (Λ)
-
-        K      = K_val      * np.ones_like(self._q)
-        D      = D_val      * np.ones_like(self._q)
-        Lambda = Lambda_val * np.ones_like(self._q)   # diag(Λ), element-wise 사용
+        tau_ext = self._Jb.T @ wrench_ext_body          # (N,1)
+        #tau_ext = 0
+        tau_ext = np.clip(tau_ext, -10.0, 10.0)         
 
         
+        if getattr(self, "enable_force_control", False):
+            Fz_des = float(getattr(self, "desired_normal_force", 5.0))
+        else:
+            Fz_des = 0.0
 
-        tau_des = np.zeros_like(self._q)  
-        eps = tau_des - tau_ext
+        wrench_des_body = np.zeros((6, 1))
+        wrench_des_body[2, 0] = Fz_des
 
-        qddot_cmd = (
-            self._qddot_des
-            + (D * e_dot + K * e - eps) / Lambda
-        )
+        tau_des = self._Jb.T @ wrench_des_body          # (N,1)
 
-        tau = self._M @ qddot_cmd + self._c + self._g - tau_ext
+        
+        e     = self._q_des    - self._q                # (N,1)
+        e_dot = self._qdot_des - self._qdot             # (N,1)
+
+      
+        K_val = 50                                  # stiffness (scalar → element-wise)
+        K = K_val * np.ones_like(self._q)               # (N,1)
+
+        M_diag = np.diag(self._M).reshape(-1, 1)        # (N,1)
+        M_diag = np.clip(M_diag, 0.1, np.inf)
+        Lambda = M_diag                                 # (N,1)
+
+        D = 2.0 * np.sqrt(K * Lambda)                   # (N,1)
+
+        eps = tau_des - tau_ext                         # (N,1)
+
+        qddot_cmd = self._qddot_des + (D * e_dot + K * e - eps) / Lambda   # (N,1)
+
+
+        tau = self._M @ qddot_cmd + self._c + self._g - tau_ext           # (N,1)
 
         self._tau = tau
 
@@ -544,7 +554,7 @@ class PybulletRobot:
             K_tau = np.array([[20.0 ],[20.0 ],[20.0 ],[20.0 ],[10.0 ],[5.0 ],[1.0 ]])
 
             # Kp   = 150
-            Kd   = 50
+            Kd   = 100
             # K_tau = 20
 
             Ki = 0.1*Kp
@@ -591,12 +601,43 @@ class PybulletRobot:
     ##peg_imp
     ### 논문 제어기
     def _compute_torque_input_peg_impedance(self):
-        # PSFT 기반 EE 목표/축힘 생성
-        p_des, R_des, f_axial_world = self.psft_generator.get_target(self.time)
+
+        #is_searching = getattr(self, "peg_insertion_active", False)
+        is_searching = True
+        if is_searching:
+
+            p_des, R_des, f_axial_world = self.psft_generator.get_target(self.time)
+            
+            kp_val = 300.0  
+            kr_val = 10.0
+            kv_val = 30.0 
+            
+
+            f_cmd = f_axial_world 
+
+        else:
+            if not hasattr(self, '_p_target_move'):
+                self._p_target_move = self._T_end[0:3, 3].copy()
+                self._R_target_move = self._T_end[0:3, 0:3].copy()
+                
+            p_des = self._p_target_move
+            R_des = self._R_target_move
+            
+            kp_val = 2000.0 
+            kr_val = 100.0
+            kv_val = 60.0   #
+
+            f_cmd = np.zeros(3)
+
 
         self.peg_in_hole_impedance_torque(
             p_des, R_des,
-            f_axial_world
+            f_axial_world=f_cmd,
+            Kp_lin=np.diag([kp_val] * 3),
+            Kp_rot=np.diag([kr_val] * 3),
+            Kv_lin=np.diag([kv_val] * 3),
+            Kv_rot=np.diag([1.0, 1.0, 1.0]), # 회전 댐핑은 적당히 고정
+            add_gravity=True
         )
 
     def orientation_error(self, R_des, R_cur):

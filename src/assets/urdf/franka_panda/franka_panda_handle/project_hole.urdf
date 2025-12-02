@@ -11,19 +11,19 @@
         xyz="0 0 0"
         rpy="0 0 0" />
       <mass
-        value="0.053575148377838" />
+        value="0.0535751483778379" />
       <inertia
-        ixx="0"
-        ixy="0"
-        ixz="0"
-        iyy="0"
-        iyz="0"
-        izz="0" />
+        ixx="1.56743303563329E-05"
+        ixy="-7.603871236365E-22"
+        ixz="-7.40318390391829E-22"
+        iyy="1.56743303563329E-05"
+        iyz="7.40428689222587E-22"
+        izz="1.64898728865514E-05" />
     </inertial>
     <visual>
       <origin
-        xyz="0 0 0"
-        rpy="0 0 0" />
+        xyz="0.5 -1.0 -0.98"
+        rpy="-1.5707963268 0 0" />
       <geometry>
         <mesh
           filename="package://project_hole/meshes/base_link.STL" />
@@ -36,8 +36,8 @@
     </visual>
     <collision>
       <origin
-        xyz="0 0 0"
-        rpy="0 0 0" />
+        xyz="0.5 -1.0 -0.98"
+        rpy="-1.5707963268 0 0" />
       <geometry>
         <mesh
           filename="package://project_hole/meshes/base_link.STL" />
