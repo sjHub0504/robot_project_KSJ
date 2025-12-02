@@ -1,0 +1,11 @@
+numpy==1.26.4
+scipy
+matplotlib
+jupyter
+pybullet==3.2.5
+urdf-parser-py
+
+neuromeka
+
+sphinx
+sphinx_rtd_theme

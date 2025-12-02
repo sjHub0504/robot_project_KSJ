@@ -1,0 +1,504 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en">
+<head>
+  <meta charset="utf-8" /><meta name="generator" content="Docutils 0.19: https://docutils.sourceforge.io/" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Pybullet Simulator &mdash; MECH438_pybullet 1.0 documentation</title>
+      <link rel="stylesheet" type="text/css" href="_static/pygments.css" />
+      <link rel="stylesheet" type="text/css" href="_static/css/theme.css" />
+
+  
+  <!--[if lt IE 9]>
+    <script src="_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+        <script data-url_root="./" id="documentation_options" src="_static/documentation_options.js"></script>
+        <script src="_static/jquery.js"></script>
+        <script src="_static/underscore.js"></script>
+        <script src="_static/_sphinx_javascript_frameworks_compat.js"></script>
+        <script src="_static/doctools.js"></script>
+        <script src="_static/sphinx_highlight.js"></script>
+    <script src="_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="prev" title="Welcome to MECH438_pybullet’s documentation!" href="index.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="index.html" class="icon icon-home">
+            MECH438_pybullet
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Simulator:</span></p>
+<ul class="current">
+<li class="toctree-l1 current"><a class="current reference internal" href="#">Pybullet Simulator</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="#src.core.pybullet_core.PybulletCore"><code class="docutils literal notranslate"><span class="pre">PybulletCore</span></code></a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#src.core.pybullet_core.PybulletCore.connect"><code class="docutils literal notranslate"><span class="pre">PybulletCore.connect()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="#src.core.pybullet_core.PybulletCore.disconnect"><code class="docutils literal notranslate"><span class="pre">PybulletCore.disconnect()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="#src.core.pybullet_core.PybulletCore.MoveRobot"><code class="docutils literal notranslate"><span class="pre">PybulletCore.MoveRobot()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="#src.core.pybullet_robot.PybulletRobot"><code class="docutils literal notranslate"><span class="pre">PybulletRobot</span></code></a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#src.core.pybullet_robot.PybulletRobot.robot_update"><code class="docutils literal notranslate"><span class="pre">PybulletRobot.robot_update()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="#src.core.pybullet_robot.PybulletRobot.q"><code class="docutils literal notranslate"><span class="pre">PybulletRobot.q</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="#src.core.pybullet_robot.PybulletRobot.qdot"><code class="docutils literal notranslate"><span class="pre">PybulletRobot.qdot</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="#src.core.pybullet_robot.PybulletRobot.qddot"><code class="docutils literal notranslate"><span class="pre">PybulletRobot.qddot</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="#src.core.pybullet_robot.PybulletRobot.q_des"><code class="docutils literal notranslate"><span class="pre">PybulletRobot.q_des</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="#src.core.pybullet_robot.PybulletRobot.p"><code class="docutils literal notranslate"><span class="pre">PybulletRobot.p</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="#src.core.pybullet_robot.PybulletRobot.T_end"><code class="docutils literal notranslate"><span class="pre">PybulletRobot.T_end</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="#src.core.pybullet_robot.PybulletRobot.tau"><code class="docutils literal notranslate"><span class="pre">PybulletRobot.tau</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="#src.core.pybullet_robot.PybulletRobot.Js"><code class="docutils literal notranslate"><span class="pre">PybulletRobot.Js</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="#src.core.pybullet_robot.PybulletRobot.Jb"><code class="docutils literal notranslate"><span class="pre">PybulletRobot.Jb</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="#src.core.pybullet_robot.PybulletRobot.Jr"><code class="docutils literal notranslate"><span class="pre">PybulletRobot.Jr</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="#src.core.pybullet_robot.PybulletRobot.JsInv"><code class="docutils literal notranslate"><span class="pre">PybulletRobot.JsInv()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="#src.core.pybullet_robot.PybulletRobot.Jbinv"><code class="docutils literal notranslate"><span class="pre">PybulletRobot.Jbinv()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="#src.core.pybullet_robot.PybulletRobot.Jrinv"><code class="docutils literal notranslate"><span class="pre">PybulletRobot.Jrinv</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="#src.core.pybullet_robot.PybulletRobot.M"><code class="docutils literal notranslate"><span class="pre">PybulletRobot.M</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="#src.core.pybullet_robot.PybulletRobot.C"><code class="docutils literal notranslate"><span class="pre">PybulletRobot.C</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="#src.core.pybullet_robot.PybulletRobot.c"><code class="docutils literal notranslate"><span class="pre">PybulletRobot.c</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="#src.core.pybullet_robot.PybulletRobot.g"><code class="docutils literal notranslate"><span class="pre">PybulletRobot.g</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="#src.core.pybullet_robot.PybulletRobot.q_lower"><code class="docutils literal notranslate"><span class="pre">PybulletRobot.q_lower</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="#src.core.pybullet_robot.PybulletRobot.q_upper"><code class="docutils literal notranslate"><span class="pre">PybulletRobot.q_upper</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="#src.core.pybullet_robot.PybulletRobot.jacobian"><code class="docutils literal notranslate"><span class="pre">PybulletRobot.jacobian()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="#src.core.pybullet_robot.PybulletRobot.forward_kinematics"><code class="docutils literal notranslate"><span class="pre">PybulletRobot.forward_kinematics()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="#src.core.pybullet_robot.PybulletRobot.inverse_kinematics"><code class="docutils literal notranslate"><span class="pre">PybulletRobot.inverse_kinematics()</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="index.html">MECH438_pybullet</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="index.html" class="icon icon-home" aria-label="Home"></a></li>
+      <li class="breadcrumb-item active">Pybullet Simulator</li>
+      <li class="wy-breadcrumbs-aside">
+            <a href="_sources/pybullet_simulator.rst.txt" rel="nofollow"> View page source</a>
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="module-src.core">
+<span id="pybullet-simulator"></span><h1>Pybullet Simulator<a class="headerlink" href="#module-src.core" title="Permalink to this heading"></a></h1>
+<p>Modules</p>
+<hr class="docutils" />
+<blockquote>
+<div><span class="target" id="module-src.core.pybullet_core"></span><section id="pybulletcore">
+<h2>PybulletCore<a class="headerlink" href="#pybulletcore" title="Permalink to this heading"></a></h2>
+</section>
+<dl class="py class">
+<dt class="sig sig-object py" id="src.core.pybullet_core.PybulletCore">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">src.core.pybullet_core.</span></span><span class="sig-name descname"><span class="pre">PybulletCore</span></span><a class="headerlink" href="#src.core.pybullet_core.PybulletCore" title="Permalink to this definition"></a></dt>
+<dd><p>Pybullet Simulator Core Class</p>
+<dl class="py method">
+<dt class="sig sig-object py" id="src.core.pybullet_core.PybulletCore.connect">
+<span class="sig-name descname"><span class="pre">connect</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">robot_name</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'indy7_v2'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">joint_limit</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">constraint_visualization</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#src.core.pybullet_core.PybulletCore.connect" title="Permalink to this definition"></a></dt>
+<dd><p>Connect to Pybullet GUI</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>robot_name</strong> (<em>string</em>) – robot name want to import, defaults to ‘indy7_v2’</p></li>
+<li><p><strong>joint_limit</strong> (<em>bool</em>) – activate/deactivate the joint limit constraint, defaults to True</p></li>
+<li><p><strong>constraint_visualization</strong> (<em>bool</em>) – activate/deactivate the constraint visualizer, defaults to True</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="src.core.pybullet_core.PybulletCore.disconnect">
+<span class="sig-name descname"><span class="pre">disconnect</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#src.core.pybullet_core.PybulletCore.disconnect" title="Permalink to this definition"></a></dt>
+<dd><p>Disconnect to Pybullet GUI</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="src.core.pybullet_core.PybulletCore.MoveRobot">
+<span class="sig-name descname"><span class="pre">MoveRobot</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">q</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">degree</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">verbose</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#src.core.pybullet_core.PybulletCore.MoveRobot" title="Permalink to this definition"></a></dt>
+<dd><p>Move the robot to the given joint angle</p>
+</dd></dl>
+
+</dd></dl>
+
+<span class="target" id="module-src.core.pybullet_robot"></span><section id="pybulletrobot">
+<h2>PybulletRobot<a class="headerlink" href="#pybulletrobot" title="Permalink to this heading"></a></h2>
+</section>
+<dl class="py class">
+<dt class="sig sig-object py" id="src.core.pybullet_robot.PybulletRobot">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">src.core.pybullet_robot.</span></span><span class="sig-name descname"><span class="pre">PybulletRobot</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">ClientId</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">robot_info</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dt</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#src.core.pybullet_robot.PybulletRobot" title="Permalink to this definition"></a></dt>
+<dd><p>Pybullet Simulator Robot Class</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>ClientId</strong> (<em>int</em>) – pybullet GUI client’s ID</p></li>
+<li><p><strong>robot_info</strong> (<em>dict</em><em>[</em><em>]</em>) – dictionary of robot’s information</p></li>
+<li><p><strong>dt</strong> (<em>float</em>) – simulation time step</p></li>
+</ul>
+</dd>
+</dl>
+<dl class="py method">
+<dt class="sig sig-object py" id="src.core.pybullet_robot.PybulletRobot.robot_update">
+<span class="sig-name descname"><span class="pre">robot_update</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#src.core.pybullet_robot.PybulletRobot.robot_update" title="Permalink to this definition"></a></dt>
+<dd><p>Update the state of the robot by implementing _pre_robot_update, _get_robot_states, _compute_torque_input,
+_control_robot, and _post_robot_update methods.</p>
+</dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="src.core.pybullet_robot.PybulletRobot.q">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">q</span></span><a class="headerlink" href="#src.core.pybullet_robot.PybulletRobot.q" title="Permalink to this definition"></a></dt>
+<dd><dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>robot’s current joint poses (rad)</p>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p>np.ndarray (n-by-1)</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="src.core.pybullet_robot.PybulletRobot.qdot">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">qdot</span></span><a class="headerlink" href="#src.core.pybullet_robot.PybulletRobot.qdot" title="Permalink to this definition"></a></dt>
+<dd><dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>robot’s current joint velocities (rad/s)</p>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p>np.ndarray (n-by-1)</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="src.core.pybullet_robot.PybulletRobot.qddot">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">qddot</span></span><a class="headerlink" href="#src.core.pybullet_robot.PybulletRobot.qddot" title="Permalink to this definition"></a></dt>
+<dd><dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>[NOT WORK!!!] robot’s current joint accelerations (rad/s^2)</p>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p>np.ndarray (n-by-1)</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="src.core.pybullet_robot.PybulletRobot.q_des">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">q_des</span></span><a class="headerlink" href="#src.core.pybullet_robot.PybulletRobot.q_des" title="Permalink to this definition"></a></dt>
+<dd><dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>robot’s desired joint poses (rad)</p>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p>np.ndarray (n-by-1)</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="src.core.pybullet_robot.PybulletRobot.p">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">p</span></span><a class="headerlink" href="#src.core.pybullet_robot.PybulletRobot.p" title="Permalink to this definition"></a></dt>
+<dd><dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>robot’s current task pose (xyz, xi)</p>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p>np.ndarray (6-by-1)</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="src.core.pybullet_robot.PybulletRobot.T_end">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">T_end</span></span><a class="headerlink" href="#src.core.pybullet_robot.PybulletRobot.T_end" title="Permalink to this definition"></a></dt>
+<dd><dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>robot’s current task pose (SE3)</p>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p>np.ndarray (4-by-4)</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="src.core.pybullet_robot.PybulletRobot.tau">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">tau</span></span><a class="headerlink" href="#src.core.pybullet_robot.PybulletRobot.tau" title="Permalink to this definition"></a></dt>
+<dd><dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>robot’s current input torques (Nm)</p>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p>np.ndarray (n-by-1)</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="src.core.pybullet_robot.PybulletRobot.Js">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">Js</span></span><a class="headerlink" href="#src.core.pybullet_robot.PybulletRobot.Js" title="Permalink to this definition"></a></dt>
+<dd><dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>Spatial jacobian in robot’s current configuration</p>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p>np.ndarray (6-by-n)</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="src.core.pybullet_robot.PybulletRobot.Jb">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">Jb</span></span><a class="headerlink" href="#src.core.pybullet_robot.PybulletRobot.Jb" title="Permalink to this definition"></a></dt>
+<dd><dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>Body jacobian in robot’s current configuration</p>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p>np.ndarray (6-by-n)</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="src.core.pybullet_robot.PybulletRobot.Jr">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">Jr</span></span><a class="headerlink" href="#src.core.pybullet_robot.PybulletRobot.Jr" title="Permalink to this definition"></a></dt>
+<dd><dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>Jacobian in robot’s current configuration</p>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p>np.ndarray (6-by-n)</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="src.core.pybullet_robot.PybulletRobot.JsInv">
+<span class="sig-name descname"><span class="pre">JsInv</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#src.core.pybullet_robot.PybulletRobot.JsInv" title="Permalink to this definition"></a></dt>
+<dd><dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>Inverse of the spatial jacobian in robot’s current configuration</p>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p>np.ndarray (n-by-6)</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="src.core.pybullet_robot.PybulletRobot.Jbinv">
+<span class="sig-name descname"><span class="pre">Jbinv</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#src.core.pybullet_robot.PybulletRobot.Jbinv" title="Permalink to this definition"></a></dt>
+<dd><dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>Inverse of the body jacobian in robot’s current configuration</p>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p>np.ndarray (n-by-6)</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="src.core.pybullet_robot.PybulletRobot.Jrinv">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">Jrinv</span></span><a class="headerlink" href="#src.core.pybullet_robot.PybulletRobot.Jrinv" title="Permalink to this definition"></a></dt>
+<dd><dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>Inverse of the jacobian in robot’s current configuration</p>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p>np.ndarray (6-by-n)</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="src.core.pybullet_robot.PybulletRobot.M">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">M</span></span><a class="headerlink" href="#src.core.pybullet_robot.PybulletRobot.M" title="Permalink to this definition"></a></dt>
+<dd><dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>Mass matrix of the robot in robot’s current configuration</p>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p>np.ndarray (n-by-n)</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="src.core.pybullet_robot.PybulletRobot.C">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">C</span></span><a class="headerlink" href="#src.core.pybullet_robot.PybulletRobot.C" title="Permalink to this definition"></a></dt>
+<dd><dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>Coriolis matrix of the robot in robot’s current configuration</p>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p>np.ndarray (n-by-n)</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="src.core.pybullet_robot.PybulletRobot.c">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">c</span></span><a class="headerlink" href="#src.core.pybullet_robot.PybulletRobot.c" title="Permalink to this definition"></a></dt>
+<dd><dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>Coriolis vector of the robot in robot’s current configuration</p>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p>np.ndarray (n-by-1)</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="src.core.pybullet_robot.PybulletRobot.g">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">g</span></span><a class="headerlink" href="#src.core.pybullet_robot.PybulletRobot.g" title="Permalink to this definition"></a></dt>
+<dd><dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>Gravity vector of the robot in robot’s current configuration</p>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p>np.ndarray (n-by-1)</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="src.core.pybullet_robot.PybulletRobot.q_lower">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">q_lower</span></span><a class="headerlink" href="#src.core.pybullet_robot.PybulletRobot.q_lower" title="Permalink to this definition"></a></dt>
+<dd><dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>Lower joint pose limits (rad)</p>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p>np.ndarray (n-by-1)</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="src.core.pybullet_robot.PybulletRobot.q_upper">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">q_upper</span></span><a class="headerlink" href="#src.core.pybullet_robot.PybulletRobot.q_upper" title="Permalink to this definition"></a></dt>
+<dd><dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>Upper joint pose limits (rad)</p>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p>np.ndarray (n-by-1)</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="src.core.pybullet_robot.PybulletRobot.jacobian">
+<span class="sig-name descname"><span class="pre">jacobian</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">q</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#src.core.pybullet_robot.PybulletRobot.jacobian" title="Permalink to this definition"></a></dt>
+<dd><dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>q</strong> (<em>np.ndarray</em>) – given robot joint position (rad)</p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>jacobian in given configuration</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>np.ndarray (6-by-n)</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="src.core.pybullet_robot.PybulletRobot.forward_kinematics">
+<span class="sig-name descname"><span class="pre">forward_kinematics</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">q</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#src.core.pybullet_robot.PybulletRobot.forward_kinematics" title="Permalink to this definition"></a></dt>
+<dd><dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>q</strong> (<em>np.ndarray</em>) – given robot joint position (rad)</p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>task pose corresponded to the given joint position (SE3)</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>np.ndarray (4-by-4)</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="src.core.pybullet_robot.PybulletRobot.inverse_kinematics">
+<span class="sig-name descname"><span class="pre">inverse_kinematics</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">T</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#src.core.pybullet_robot.PybulletRobot.inverse_kinematics" title="Permalink to this definition"></a></dt>
+<dd><dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>T</strong> (<em>np.ndarray</em>) – given robot target pose in SE3</p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>joint pos corresponded to the given task pose (rad)</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>np.ndarray (n-by-1)</p>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+</div></blockquote>
+</section>
+
+
+           </div>
+          </div>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+        <a href="index.html" class="btn btn-neutral float-left" title="Welcome to MECH438_pybullet’s documentation!" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2024, Lee Yongseok, Jung Hyunseo.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>
