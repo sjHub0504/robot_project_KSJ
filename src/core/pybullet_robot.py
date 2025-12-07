@@ -344,9 +344,9 @@ class PybulletRobot:
 
 
         target_SE3 = np.array([
-            [ 0.9918 ,-0.1278 ,-0.0075  ,0.4999],
+            [ 0.9918 ,-0.1278 ,-0.0075  ,0.5],
             [-0.1278, -0.9918, -0.0014,  0.0001],
-            [ -0.0073,  0.0023, -1. ,     0.256],
+            [ -0.0073,  0.0023, -1. ,     0.25],
             [ 0.0000,  0.0000,  0.0000,  1.0000]
         ])
 
@@ -523,14 +523,14 @@ class PybulletRobot:
         e_dot = self._qdot_des - self._qdot             # (N,1)
 
       
-        K_val = 50                                  # stiffness (scalar → element-wise)
+        K_val = 300                                  # stiffness (scalar → element-wise)
         K = K_val * np.ones_like(self._q)               # (N,1)
 
         M_diag = np.diag(self._M).reshape(-1, 1)        # (N,1)
         M_diag = np.clip(M_diag, 0.1, np.inf)
-        Lambda = M_diag                                 # (N,1)
+        Lambda = 0.4* M_diag                                 # (N,1)
 
-        D = 2.0 * np.sqrt(K * Lambda)                   # (N,1)
+        D = 1.0 * np.sqrt(K * Lambda)                   # (N,1)
 
         eps = tau_des - tau_ext                         # (N,1)
 
@@ -602,8 +602,8 @@ class PybulletRobot:
     ### 논문 제어기
     def _compute_torque_input_peg_impedance(self):
 
-        #is_searching = getattr(self, "peg_insertion_active", False)
-        is_searching = True
+        is_searching = getattr(self, "peg_insertion_active", False)
+        #is_searching = True
         if is_searching:
 
             p_des, R_des, f_axial_world = self.psft_generator.get_target(self.time)

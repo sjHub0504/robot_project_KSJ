@@ -89,26 +89,28 @@ class PybulletCore:
         #         baseOrientation=hole_orn,
         #         useFixedBase=1, 
         #     )
-        visualShapeId = p.createVisualShape(
-            shapeType=p.GEOM_MESH,
-            fileName=self.__urdfpath + "/franka_panda/franka_panda_handle/meshes/visual/base_link.STL",
-            meshScale=[1, 1, 1]
-        )
+
+
+        # visualShapeId = p.createVisualShape(
+        #     shapeType=p.GEOM_MESH,
+        #     fileName=self.__urdfpath + "/franka_panda/franka_panda_handle/meshes/visual/base_link.STL",
+        #     meshScale=[1, 1, 1]
+        # )
         
-        collisionShapeId = p.createCollisionShape(
-            shapeType=p.GEOM_MESH,
-            fileName=self.__urdfpath + "/franka_panda/franka_panda_handle/meshes/collision/base_link.STL",
-            meshScale=[1, 1, 1],
-            flags=p.GEOM_FORCE_CONCAVE_TRIMESH  # [핵심] 오목한 형상(구멍) 유지!
-        )
+        # collisionShapeId = p.createCollisionShape(
+        #     shapeType=p.GEOM_MESH,
+        #     fileName=self.__urdfpath + "/franka_panda/franka_panda_handle/meshes/collision/base_link.STL",
+        #     meshScale=[1, 1, 1],
+        #     flags=p.GEOM_FORCE_CONCAVE_TRIMESH  # [핵심] 오목한 형상(구멍) 유지!
+        # )
         
-        self.holeId = p.createMultiBody(
-            baseMass=0,  # 0으로 하면 고정됨 (Static)
-            baseCollisionShapeIndex=collisionShapeId,
-            baseVisualShapeIndex=visualShapeId,
-            basePosition=[0.5, 0, 0.25],
-            baseOrientation=[0, 0, 0, 1]
-        )
+        # self.holeId = p.createMultiBody(
+        #     baseMass=0,  # 0으로 하면 고정됨 (Static)
+        #     baseCollisionShapeIndex=collisionShapeId,
+        #     baseVisualShapeIndex=visualShapeId,
+        #     basePosition=[0.5, 0, 0.25],
+        #     baseOrientation=[0, 0, 0, 1]
+        # )
 
 
         # Define robot's information
