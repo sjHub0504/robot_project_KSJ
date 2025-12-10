@@ -598,66 +598,31 @@ class PybulletRobot:
 
 
 
+    # ### Task Impedance 
+    # def _compute_torque_input_task_impedance(self):
+
+
+    # ### 논문 제어기 test
+    # def _compute_torque_input_peg_impdeance(self):
+    #     p_des, R_des, f_axial_wolrd = self.psft_generator.get_target(self.time)
+
+
+
+
+
     ##peg_imp
     ### 논문 제어기
     def _compute_torque_input_peg_impedance(self):
-
-        #is_searching = getattr(self, "peg_insertion_active", False)
-        is_searching = True
-        if is_searching:
-
-            p_des, R_des, f_axial_world = self.psft_generator.get_target(self.time)
-            
-            kp_val = 300.0  
-            kr_val = 10.0
-            kv_val = 30.0 
-            
-
-            f_cmd = f_axial_world 
-
-        else:
-            if not hasattr(self, '_p_target_move'):
-                self._p_target_move = self._T_end[0:3, 3].copy()
-                self._R_target_move = self._T_end[0:3, 0:3].copy()
-                
-            p_des = self._p_target_move
-            R_des = self._R_target_move
-            
-            kp_val = 2000.0 
-            kr_val = 100.0
-            kv_val = 60.0   #
-
-            f_cmd = np.zeros(3)
-
-
-        self.peg_in_hole_impedance_torque(
-            p_des, R_des,
-            f_axial_world=f_cmd,
-            Kp_lin=np.diag([kp_val] * 3),
-            Kp_rot=np.diag([kr_val] * 3),
-            Kv_lin=np.diag([kv_val] * 3),
-            Kv_rot=np.diag([1.0, 1.0, 1.0]), # 회전 댐핑은 적당히 고정
-            add_gravity=True
-        )
-
-    def orientation_error(self, R_des, R_cur):
-        R_err = R_des @ R_cur.T 
-        phi = pin.log3(R_err)
-        return phi
-
-    def peg_in_hole_impedance_torque(
-        self,
-        p_des, R_des,
-        f_axial_world,
+        p_des, R_des,f_axial_world = 
         Kp_lin=np.diag([300.0, 300.0, 300.0]), # 강성 (Stiffness)
         Kp_rot=np.diag([10.0, 10.0, 10.0]),    # 회전 강성
         Kv_lin=np.diag([20.0, 20.0, 20.0]),    # 선형 댐핑 (Damping)
         Kv_rot=np.diag([1.0, 1.0, 1.0]),       # 회전 댐핑
         Omega_f=np.diag([1.0, 1.0, 1.0]),
         Omega_m=np.diag([1.0, 1.0, 1.0]),
-        add_gravity=True,
-    ):
-        # 1) 현재 q, qdot
+
+
+            # 1) 현재 q, qdot
         q    = self._q.reshape(-1)
         qdot = self._qdot.reshape(-1)
 
@@ -712,11 +677,130 @@ class PybulletRobot:
 
         # 8) 중력 보상 포함
         tau = tau_task.reshape(-1, 1)
-        if add_gravity:
-            tau += self._g
+        tau += self._g
 
         self._tau = tau
         return tau
+
+
+
+    # def _compute_torque_input_peg_impedance(self):
+
+    #     #is_searching = getattr(self, "peg_insertion_active", False)
+    #     is_searching = True
+    #     if is_searching:
+
+    #         p_des, R_des, f_axial_world = self.psft_generator.get_target(self.time)
+            
+    #         kp_val = 300.0  
+    #         kr_val = 10.0
+    #         kv_val = 30.0 
+            
+
+    #         f_cmd = f_axial_world 
+
+    #     else:
+    #         if not hasattr(self, '_p_target_move'):
+    #             self._p_target_move = self._T_end[0:3, 3].copy()
+    #             self._R_target_move = self._T_end[0:3, 0:3].copy()
+                
+    #         p_des = self._p_target_move
+    #         R_des = self._R_target_move
+            
+    #         kp_val = 2000.0 
+    #         kr_val = 100.0
+    #         kv_val = 60.0   #
+
+    #         f_cmd = np.zeros(3)
+
+
+    #     self.peg_in_hole_impedance_torque(
+    #         p_des, R_des,
+    #         f_axial_world=f_cmd,
+    #         Kp_lin=np.diag([kp_val] * 3),
+    #         Kp_rot=np.diag([kr_val] * 3),
+    #         Kv_lin=np.diag([kv_val] * 3),
+    #         Kv_rot=np.diag([1.0, 1.0, 1.0]), # 회전 댐핑은 적당히 고정
+    #         add_gravity=True
+    #     )
+
+    # def orientation_error(self, R_des, R_cur):
+    #     R_err = R_des @ R_cur.T 
+    #     phi = pin.log3(R_err)
+    #     return phi
+
+    # def peg_in_hole_impedance_torque(
+    #     self,
+    #     p_des, R_des,
+    #     f_axial_world,
+    #     Kp_lin=np.diag([300.0, 300.0, 300.0]), # 강성 (Stiffness)
+    #     Kp_rot=np.diag([10.0, 10.0, 10.0]),    # 회전 강성
+    #     Kv_lin=np.diag([20.0, 20.0, 20.0]),    # 선형 댐핑 (Damping)
+    #     Kv_rot=np.diag([1.0, 1.0, 1.0]),       # 회전 댐핑
+    #     Omega_f=np.diag([1.0, 1.0, 1.0]),
+    #     Omega_m=np.diag([1.0, 1.0, 1.0]),
+    #     add_gravity=True,
+    # ):
+    #     # 1) 현재 q, qdot
+    #     q    = self._q.reshape(-1)
+    #     qdot = self._qdot.reshape(-1)
+
+    #     model = self.pinModel.pinModel
+    #     data  = self.pinModel.pinData 
+
+    #     # 2) Pinocchio kinematics / Jacobian
+    #     pin.forwardKinematics(model, data, q)
+    #     pin.updateFramePlacements(model, data)
+    #     pin.computeJointJacobians(model, data, q)
+
+    #     # 현재 EE 상태 (World Frame)
+    #     oMf = data.oMf[self._ee_frame_id]
+    #     p_cur = oMf.translation.copy()
+    #     R_cur = oMf.rotation.copy()
+
+    #     # [중요] 현재 Cartesian 속도 계산 (v = J * qdot)
+    #     # LOCAL_WORLD_ALIGNED를 썼으므로 v_cur도 [Linear_World, Angular_World] 입니다.
+    #     J6 = pin.getFrameJacobian(
+    #         model, data, self._ee_frame_id,
+    #         pin.ReferenceFrame.LOCAL_WORLD_ALIGNED
+    #     )
+    #     v_cartesian = J6 @ qdot
+    #     v_lin = v_cartesian[0:3] # 선형 속도
+    #     v_rot = v_cartesian[3:6] # 각속도
+
+    #     # 3) 에러 계산
+    #     e_p = p_des - p_cur                          
+    #     phi = self.orientation_error(R_des, R_cur)   
+
+    #     # 4) 임피던스 힘/모멘트 (Spring + Damping)
+    #     # F = Kp * error - Kv * velocity
+    #     f_spring = Kp_lin @ e_p
+    #     f_damp   = -Kv_lin @ v_lin  # [핵심] 댐핑이 있어야 발산 안함!
+        
+    #     m_spring = Kp_rot @ phi
+    #     m_damp   = -Kv_rot @ v_rot  # [핵심]
+
+    #     # 합치기
+    #     f_t = f_spring + f_damp
+    #     m_t = m_spring + m_damp
+
+    #     # 5) PSFT 축 방향 힘 더하고 task selection 적용
+    #     f = Omega_f @ (f_t + f_axial_world)
+    #     m = Omega_m @ m_t
+
+    #     # 6) 6D wrench (world 기준)
+    #     wrench = np.concatenate([f, m])
+
+    #     # 7) Torque 변환
+    #     tau_task = J6.T @ wrench
+
+    #     # 8) 중력 보상 포함
+    #     tau = tau_task.reshape(-1, 1)
+    #     if add_gravity:
+    #         tau += self._g
+
+    #     self._tau = tau
+    #     return tau
 
 
 
