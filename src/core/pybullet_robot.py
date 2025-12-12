@@ -19,7 +19,11 @@ import pinocchio as pin
 
 from ..utils import *
 
+from scipy.spatial.transform import Rotation as R
+
 JOINT_SAFETY_FACTOR = 0.95
+
+
 
 
 def get_subdirectories(path):
@@ -272,6 +276,9 @@ class PybulletRobot:
         self._qdot_des = np.zeros([self.numJoints, 1])   # desired velocity of joints
         self._qddot_des = np.zeros([self.numJoints, 1])  # desired acceleration of joints
 
+        self._p_des = np.zeros([3,1])
+        self._R_des = np.zeros([3,1])
+
         self._Js = np.zeros([6, self.numJoints])      # Spatial jacobian matrix.
         self._Jb = np.zeros([6, self.numJoints])      # Body jacobian matrix.
         self._Jr = np.zeros([6, self.numJoints])      # Jacobian matrix.
@@ -344,9 +351,9 @@ class PybulletRobot:
 
 
         target_SE3 = np.array([
-            [ 0.9918 ,-0.1278 ,-0.0075  ,0.4999],
+            [ 0.9918 ,-0.1278 ,-0.0075  ,0.5],
             [-0.1278, -0.9918, -0.0014,  0.0001],
-            [ -0.0073,  0.0023, -1. ,     0.256],
+            [ -0.0073,  0.0023, -1. ,     0.25],
             [ 0.0000,  0.0000,  0.0000,  1.0000]
         ])
 
@@ -523,14 +530,14 @@ class PybulletRobot:
         e_dot = self._qdot_des - self._qdot             # (N,1)
 
       
-        K_val = 50                                  # stiffness (scalar → element-wise)
+        K_val = 300                                  # stiffness (scalar → element-wise)
         K = K_val * np.ones_like(self._q)               # (N,1)
 
         M_diag = np.diag(self._M).reshape(-1, 1)        # (N,1)
         M_diag = np.clip(M_diag, 0.1, np.inf)
-        Lambda = M_diag                                 # (N,1)
+        Lambda = 0.4* M_diag                                 # (N,1)
 
-        D = 2.0 * np.sqrt(K * Lambda)                   # (N,1)
+        D = 1.0 * np.sqrt(K * Lambda)                   # (N,1)
 
         eps = tau_des - tau_ext                         # (N,1)
 
@@ -598,125 +605,215 @@ class PybulletRobot:
 
 
 
+    # ### Task Impedance 
+    # def _compute_torque_input_task_impedance(self):
+
+
+    # ### 논문 제어기 test
+    # def _compute_torque_input_peg_impdeance(self):
+    #     p_des, R_des, f_axial_wolrd = self.psft_generator.get_target(self.time)
+
+
+    def target_update(self, target_pose):
+        val = np.array(target_pose).flatten()
+    
+        # 위치 (x, y, z)
+        self._p_des[0:3] = val[0:3].reshape(3, 1)
+        
+        # 회전 벡터 (rx, ry, rz)
+        self._R_des[0:3] = val[3:6].reshape(3, 1)
+
+
+
+
     ##peg_imp
     ### 논문 제어기
     def _compute_torque_input_peg_impedance(self):
 
-        #is_searching = getattr(self, "peg_insertion_active", False)
-        is_searching = True
-        if is_searching:
+        #x_curr, R_curr, J, g,          # 로봇 현재 상태 (위치, 회전, 자코비안, 중력)
+        #x_des, R_des,                  # 목표 상태 (위치, 회전)
+        # --- 1. 튜닝 게인 및 설정 ---
+        kp = 300.0   # Stiffness (N/m)
+        kw = 3.0     # Orientation Stiffness (Nm/rad)
+        f_z_des = 0 # Z축 조립 힘 (N, 아래로 누르는 힘)
 
-            p_des, R_des, f_axial_world = self.psft_generator.get_target(self.time)
-            
-            kp_val = 300.0  
-            kr_val = 10.0
-            kv_val = 30.0 
-            
+        # --- 2. 현재 상태 가져오기 ---
+        # 로봇의 상태는 벡터로 오므로 편의를 위해 분리
+        p_curr_vec = np.array(self._p).flatten()
+        x_curr = p_curr_vec[0:3]     # 현재 위치 (World)
+        w_curr = p_curr_vec[3:6]     # 현재 회전 벡터
+        R_curr_mat = Vec2Rot(w_curr) # 현재 회전 행렬 (Body -> World)
 
-            f_cmd = f_axial_world 
+        # --- 3. 목표 상태 가져오기 ---
+        x_des = np.array(self._p_des).flatten() # 목표 위치 (World)
+        w_des = np.array(self._R_des).flatten() # 목표 회전 벡터
+        R_des_mat = Vec2Rot(w_des)              # 목표 회전 행렬
 
-        else:
-            if not hasattr(self, '_p_target_move'):
-                self._p_target_move = self._T_end[0:3, 3].copy()
-                self._R_target_move = self._T_end[0:3, 0:3].copy()
-                
-            p_des = self._p_target_move
-            R_des = self._R_target_move
-            
-            kp_val = 2000.0 
-            kr_val = 100.0
-            kv_val = 60.0   #
-
-            f_cmd = np.zeros(3)
-
-
-        self.peg_in_hole_impedance_torque(
-            p_des, R_des,
-            f_axial_world=f_cmd,
-            Kp_lin=np.diag([kp_val] * 3),
-            Kp_rot=np.diag([kr_val] * 3),
-            Kv_lin=np.diag([kv_val] * 3),
-            Kv_rot=np.diag([1.0, 1.0, 1.0]), # 회전 댐핑은 적당히 고정
-            add_gravity=True
-        )
-
-    def orientation_error(self, R_des, R_cur):
-        R_err = R_des @ R_cur.T 
-        phi = pin.log3(R_err)
-        return phi
-
-    def peg_in_hole_impedance_torque(
-        self,
-        p_des, R_des,
-        f_axial_world,
-        Kp_lin=np.diag([300.0, 300.0, 300.0]), # 강성 (Stiffness)
-        Kp_rot=np.diag([10.0, 10.0, 10.0]),    # 회전 강성
-        Kv_lin=np.diag([20.0, 20.0, 20.0]),    # 선형 댐핑 (Damping)
-        Kv_rot=np.diag([1.0, 1.0, 1.0]),       # 회전 댐핑
-        Omega_f=np.diag([1.0, 1.0, 1.0]),
-        Omega_m=np.diag([1.0, 1.0, 1.0]),
-        add_gravity=True,
-    ):
-        # 1) 현재 q, qdot
-        q    = self._q.reshape(-1)
-        qdot = self._qdot.reshape(-1)
-
-        model = self.pinModel.pinModel
-        data  = self.pinModel.pinData 
-
-        # 2) Pinocchio kinematics / Jacobian
-        pin.forwardKinematics(model, data, q)
-        pin.updateFramePlacements(model, data)
-        pin.computeJointJacobians(model, data, q)
-
-        # 현재 EE 상태 (World Frame)
-        oMf = data.oMf[self._ee_frame_id]
-        p_cur = oMf.translation.copy()
-        R_cur = oMf.rotation.copy()
-
-        # [중요] 현재 Cartesian 속도 계산 (v = J * qdot)
-        # LOCAL_WORLD_ALIGNED를 썼으므로 v_cur도 [Linear_World, Angular_World] 입니다.
-        J6 = pin.getFrameJacobian(
-            model, data, self._ee_frame_id,
-            pin.ReferenceFrame.LOCAL_WORLD_ALIGNED
-        )
-        v_cartesian = J6 @ qdot
-        v_lin = v_cartesian[0:3] # 선형 속도
-        v_rot = v_cartesian[3:6] # 각속도
-
-        # 3) 에러 계산
-        e_p = p_des - p_cur                          
-        phi = self.orientation_error(R_des, R_cur)   
-
-        # 4) 임피던스 힘/모멘트 (Spring + Damping)
-        # F = Kp * error - Kv * velocity
-        f_spring = Kp_lin @ e_p
-        f_damp   = -Kv_lin @ v_lin  # [핵심] 댐핑이 있어야 발산 안함!
+        # --- 4. 힘 (Force) 계산 [World Frame] ---
+        # 위치 오차 계산
+        p_err = x_des - x_curr
         
-        m_spring = Kp_rot @ phi
-        m_damp   = -Kv_rot @ v_rot  # [핵심]
+        # 임피던스 힘 계산 (f_t = kp * error)
+        f_t = kp * p_err
 
-        # 합치기
-        f_t = f_spring + f_damp
-        m_t = m_spring + m_damp
+        # Selection Matrix 적용 (수동)
+        # X, Y축: 위치 제어 (임피던스)
+        # Z축: 힘 제어 (어셈블리 포스)
+        f_cmd_world = np.zeros(3)
+        f_cmd_world[0] = f_t[0]
+        f_cmd_world[1] = f_t[1]
+        f_cmd_world[2] = f_z_des 
 
-        # 5) PSFT 축 방향 힘 더하고 task selection 적용
-        f = Omega_f @ (f_t + f_axial_world)
-        m = Omega_m @ m_t
+        # --- 5. 모멘트 (Moment) 계산 [World Frame] ---
+        # 회전 오차 행렬 (R_err = R_des * R_curr^T) -> World Frame 기준 오차
+        R_err_mat = R_des_mat @ R_curr_mat.T
+        
+        # 회전 벡터로 변환 (Rotation Vector)
+        ori_err_world = Rot2Vec(R_err_mat).flatten()
+        
+        # 모멘트 생성 (m = kw * error)
+        m_cmd_world = kw * ori_err_world
 
-        # 6) 6D wrench (world 기준)
-        wrench = np.concatenate([f, m])
+        # --- 6. 좌표계 변환 [World -> Body] (핵심 수정 부분) ---
+        # 현재 _Jb(Body Jacobian)를 사용하고 있으므로, 
+        # World Frame의 힘/모멘트를 Body Frame으로 회전시켜야 함.
+        
+        # f_body = R_curr^T * f_world
+        f_cmd_body = R_curr_mat.T @ f_cmd_world
+        
+        # m_body = R_curr^T * m_world
+        m_cmd_body = R_curr_mat.T @ m_cmd_world
 
-        # 7) Torque 변환
-        tau_task = J6.T @ wrench
+        # 6D Wrench 벡터 합치기 (Body Frame)
+        f_star_body = np.hstack([f_cmd_body, m_cmd_body])
 
-        # 8) 중력 보상 포함
-        tau = tau_task.reshape(-1, 1)
-        if add_gravity:
-            tau += self._g
+        # --- 7. 토크 계산 ---
+        # tau = J^T * f_star + g
+        # 이제 Jb.T (Body Jacobian Transpose)와 f_star_body (Body Wrench)의 좌표계가 일치함
+        #tau = self._Jb.T @ f_star_body + self._g.flatten()
+        # tau = self._g
 
-        self._tau = tau
-        return tau
+        self._tau = self._Jb.T @ f_star_body + self._g.flatten()
+
+
+
+    # def _compute_torque_input_peg_impedance(self):
+
+    #     #is_searching = getattr(self, "peg_insertion_active", False)
+    #     is_searching = True
+    #     if is_searching:
+
+    #         p_des, R_des, f_axial_world = self.psft_generator.get_target(self.time)
+            
+    #         kp_val = 300.0  
+    #         kr_val = 10.0
+    #         kv_val = 30.0 
+            
+
+    #         f_cmd = f_axial_world 
+
+    #     else:
+    #         if not hasattr(self, '_p_target_move'):
+    #             self._p_target_move = self._T_end[0:3, 3].copy()
+    #             self._R_target_move = self._T_end[0:3, 0:3].copy()
+                
+    #         p_des = self._p_target_move
+    #         R_des = self._R_target_move
+            
+    #         kp_val = 2000.0 
+    #         kr_val = 100.0
+    #         kv_val = 60.0   #
+
+    #         f_cmd = np.zeros(3)
+
+
+    #     self.peg_in_hole_impedance_torque(
+    #         p_des, R_des,
+    #         f_axial_world=f_cmd,
+    #         Kp_lin=np.diag([kp_val] * 3),
+    #         Kp_rot=np.diag([kr_val] * 3),
+    #         Kv_lin=np.diag([kv_val] * 3),
+    #         Kv_rot=np.diag([1.0, 1.0, 1.0]), # 회전 댐핑은 적당히 고정
+    #         add_gravity=True
+    #     )
+
+    # def orientation_error(self, R_des, R_cur):
+    #     R_err = R_des @ R_cur.T 
+    #     phi = pin.log3(R_err)
+    #     return phi
+
+    # def peg_in_hole_impedance_torque(
+    #     self,
+    #     p_des, R_des,
+    #     f_axial_world,
+    #     Kp_lin=np.diag([300.0, 300.0, 300.0]), # 강성 (Stiffness)
+    #     Kp_rot=np.diag([10.0, 10.0, 10.0]),    # 회전 강성
+    #     Kv_lin=np.diag([20.0, 20.0, 20.0]),    # 선형 댐핑 (Damping)
+    #     Kv_rot=np.diag([1.0, 1.0, 1.0]),       # 회전 댐핑
+    #     Omega_f=np.diag([1.0, 1.0, 1.0]),
+    #     Omega_m=np.diag([1.0, 1.0, 1.0]),
+    #     add_gravity=True,
+    # ):
+    #     # 1) 현재 q, qdot
+    #     q    = self._q.reshape(-1)
+    #     qdot = self._qdot.reshape(-1)
+
+    #     model = self.pinModel.pinModel
+    #     data  = self.pinModel.pinData 
+
+    #     # 2) Pinocchio kinematics / Jacobian
+    #     pin.forwardKinematics(model, data, q)
+    #     pin.updateFramePlacements(model, data)
+    #     pin.computeJointJacobians(model, data, q)
+
+    #     # 현재 EE 상태 (World Frame)
+    #     oMf = data.oMf[self._ee_frame_id]
+    #     p_cur = oMf.translation.copy()
+    #     R_cur = oMf.rotation.copy()
+
+    #     # [중요] 현재 Cartesian 속도 계산 (v = J * qdot)
+    #     # LOCAL_WORLD_ALIGNED를 썼으므로 v_cur도 [Linear_World, Angular_World] 입니다.
+    #     J6 = pin.getFrameJacobian(
+    #         model, data, self._ee_frame_id,
+    #         pin.ReferenceFrame.LOCAL_WORLD_ALIGNED
+    #     )
+    #     v_cartesian = J6 @ qdot
+    #     v_lin = v_cartesian[0:3] # 선형 속도
+    #     v_rot = v_cartesian[3:6] # 각속도
+
+    #     # 3) 에러 계산
+    #     e_p = p_des - p_cur                          
+    #     phi = self.orientation_error(R_des, R_cur)   
+
+    #     # 4) 임피던스 힘/모멘트 (Spring + Damping)
+    #     # F = Kp * error - Kv * velocity
+    #     f_spring = Kp_lin @ e_p
+    #     f_damp   = -Kv_lin @ v_lin  # [핵심] 댐핑이 있어야 발산 안함!
+        
+    #     m_spring = Kp_rot @ phi
+    #     m_damp   = -Kv_rot @ v_rot  # [핵심]
+
+    #     # 합치기
+    #     f_t = f_spring + f_damp
+    #     m_t = m_spring + m_damp
+
+    #     # 5) PSFT 축 방향 힘 더하고 task selection 적용
+    #     f = Omega_f @ (f_t + f_axial_world)
+    #     m = Omega_m @ m_t
+
+    #     # 6) 6D wrench (world 기준)
+    #     wrench = np.concatenate([f, m])
+
+    #     # 7) Torque 변환
+    #     tau_task = J6.T @ wrench
+
+    #     # 8) 중력 보상 포함
+    #     tau = tau_task.reshape(-1, 1)
+    #     if add_gravity:
+    #         tau += self._g
+
+    #     self._tau = tau
+    #     return tau
 
 
 

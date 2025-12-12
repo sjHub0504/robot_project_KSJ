@@ -39,7 +39,7 @@ class PybulletCore:
 
         self.g_vector = np.array([0, 0, -9.81]).reshape([3, 1])
 
-        self.dt = 1. / 1000  # Simulation Frequency 240
+        self.dt = 1. /240  # Simulation Frequency 240
 
     def connect(self, robot_name = 'indy7_v2', joint_limit=True, constraint_visualization=True):
         """
